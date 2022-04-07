@@ -725,6 +725,14 @@ func (c *Controller) syncMachineConfig(name string, labels map[string]string, bo
 	mc.Spec.KernelArguments = kernelArguments
 	mc.Spec.Config = mcNew.Spec.Config
 
+	// update version if we sync update
+	// retain any annotations that might have been added
+	if mc.Annotations == nil {
+		mc.Annotations = annotations
+	} else {
+		mc.Annotations[GeneratedByControllerVersionAnnotationKey] = version.Version
+	}
+
 	l := logline(!ignEq, !kernelArgsEq, bootcmdline)
 	klog.V(2).Infof("syncMachineConfig(): updating MachineConfig %s with%s", mc.ObjectMeta.Name, l)
 	_, err = c.clients.MC.MachineconfigurationV1().MachineConfigs().Update(context.TODO(), mc, metav1.UpdateOptions{})
