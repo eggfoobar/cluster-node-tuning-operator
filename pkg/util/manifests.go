@@ -24,6 +24,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/cluster-node-tuning-operator/pkg/performanceprofile/controller/performanceprofile/components"
+	mcfgv1 "github.com/openshift/machine-config-operator/pkg/apis/machineconfiguration.openshift.io/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
 )
 
@@ -96,4 +99,43 @@ func ListFilesFromMultiplePaths(dirPaths []string) ([]string, error) {
 		}
 	}
 	return results, nil
+}
+
+// When no MCPs are present, it is desirable to still generate the relevant files based off of the standard
+// MCP labels and node selectors. Here we create the default `master` and `worker` MCP with their respective base
+// Labels and NodeSelector Labels, this allows any resource such as PAO's to utalize the deault during bootstrap
+// rendoring.
+func createLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
+	const (
+		master             = "master"
+		worker             = "worker"
+		masterLabels       = components.MachineConfigPoolRoleLabelPrefix + master
+		workerLabels       = components.MachineConfigPoolRoleLabelPrefix + worker
+		masterNodeSelector = components.NodeRoleLabelPrefix + master
+		workerNodeSelector = components.NodeRoleLabelPrefix + worker
+	)
+	return []*mcfgv1.MachineConfigPool{
+		{
+			ObjectMeta: v1.ObjectMeta{
+				Labels: map[string]string{
+					masterLabels: "",
+				},
+				Name: master,
+			},
+			Spec: mcfgv1.MachineConfigPoolSpec{
+				NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, masterNodeSelector, ""),
+			},
+		},
+		{
+			ObjectMeta: v1.ObjectMeta{
+				Labels: map[string]string{
+					workerLabels: "",
+				},
+				Name: worker,
+			},
+			Spec: mcfgv1.MachineConfigPoolSpec{
+				NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, workerNodeSelector, ""),
+			},
+		},
+	}
 }
