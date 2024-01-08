@@ -109,8 +109,9 @@ func createLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
 	const (
 		master             = "master"
 		worker             = "worker"
-		masterLabels       = components.MachineConfigPoolRoleLabelPrefix + master
-		workerLabels       = components.MachineConfigPoolRoleLabelPrefix + worker
+		labelPrefix        = "pools.operator.machineconfiguration.openshift.io/"
+		masterLabels       = labelPrefix + master
+		workerLabels       = labelPrefix + worker
 		masterNodeSelector = components.NodeRoleLabelPrefix + master
 		workerNodeSelector = components.NodeRoleLabelPrefix + worker
 	)
