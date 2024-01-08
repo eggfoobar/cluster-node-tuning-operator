@@ -105,7 +105,7 @@ func ListFilesFromMultiplePaths(dirPaths []string) ([]string, error) {
 // MCP labels and node selectors. Here we create the default `master` and `worker` MCP with their respective base
 // Labels and NodeSelector Labels, this allows any resource such as PAO's to utalize the deault during bootstrap
 // rendoring.
-func createLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
+func CreateLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
 	const (
 		master             = "master"
 		worker             = "worker"
@@ -139,4 +139,17 @@ func createLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
 			},
 		},
 	}
+}
+
+func AddGeneratedByAnnotation(annotations map[string]string, profileName, profileNamespace string) map[string]string {
+	const generatedByAnnotationKey = "performanceprofile.openshift.io/generatedby"
+	if annotations == nil {
+		annotations = make(map[string]string)
+	}
+	value := profileName
+	if profileNamespace != "" {
+		value = fmt.Sprintf("%s/%s", value, profileNamespace)
+	}
+	annotations[generatedByAnnotationKey] = value
+	return annotations
 }

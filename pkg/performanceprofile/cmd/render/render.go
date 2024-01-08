@@ -165,7 +165,7 @@ func render(inputDir, outputDir string) error {
 	// Master, Worker ones and make sure that any PAO manifests that specify a Master or Worker label
 	// get correctly rendered. Specifying MCPs outside of the default will still cause a failure as is expected.
 	if len(mcPools) == 0 {
-		mcPools = append(mcPools, createLabeledDefaultMCPManifests()...)
+		mcPools = append(mcPools, util.CreateLabeledDefaultMCPManifests()...)
 	}
 
 	for _, pp := range perfProfiles {
@@ -212,6 +212,11 @@ func render(inputDir, outputDir string) error {
 		for _, componentObj := range components.ToObjects() {
 			componentObj.SetOwnerReferences(or)
 		}
+
+		// TODO: Resolve why kubelet ownership breaks bootstrap
+		components.KubeletConfig.SetOwnerReferences(nil)
+		anno := util.AddGeneratedByAnnotation(components.KubeletConfig.GetAnnotations(), pp.Name, pp.Namespace)
+		components.KubeletConfig.SetAnnotations(anno)
 
 		for kind, manifest := range components.ToManifestTable() {
 			b, err := yaml.Marshal(manifest)
