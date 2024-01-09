@@ -2,12 +2,9 @@ apiVersion: config.openshift.io/v1
 kind: Node
 metadata:
   creationTimestamp: null
+  annotations:
+    performanceprofile.openshift.io/generated-at-boostrap-by: manual
   name: cluster
-  ownerReferences:
-  - apiVersion: performance.openshift.io/v2
-    kind: PerformanceProfile
-    name: manual
-    uid: ""
 spec:
   cgroupMode: v1
 status: {}

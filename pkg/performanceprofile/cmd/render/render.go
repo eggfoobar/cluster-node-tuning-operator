@@ -38,9 +38,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/uuid"
 
 	"k8s.io/klog"
 )
@@ -191,28 +189,11 @@ func render(inputDir, outputDir string) error {
 			return err
 		}
 
-		uid := pp.UID
-		if uid == types.UID("") {
-			uid = uuid.NewUUID()
-		}
-
-		or := []v1.OwnerReference{
-			{
-				Kind:       pp.Kind,
-				Name:       pp.Name,
-				APIVersion: pp.APIVersion,
-				UID:        uid,
-			},
-		}
-
 		for _, componentObj := range components.ToObjects() {
-			componentObj.SetOwnerReferences(or)
+			componentObj.SetOwnerReferences(nil)
+			anno := util.AddBootstrapGeneratedByAnnotation(componentObj.GetAnnotations(), pp.Name, pp.Namespace)
+			componentObj.SetAnnotations(anno)
 		}
-
-		// TODO: Resolve why kubelet ownership breaks bootstrap
-		components.KubeletConfig.SetOwnerReferences(nil)
-		anno := util.AddGeneratedByAnnotation(components.KubeletConfig.GetAnnotations(), pp.Name, pp.Namespace)
-		components.KubeletConfig.SetAnnotations(anno)
 
 		for kind, manifest := range components.ToManifestTable() {
 			b, err := yaml.Marshal(manifest)

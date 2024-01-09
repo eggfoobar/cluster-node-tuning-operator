@@ -2,13 +2,10 @@ apiVersion: tuned.openshift.io/v1
 kind: Tuned
 metadata:
   creationTimestamp: null
+  annotations:
+    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-worker
   name: openshift-node-performance-openshift-bootstrap-worker
   namespace: openshift-cluster-node-tuning-operator
-  ownerReferences:
-  - apiVersion: performance.openshift.io/v2
-    kind: PerformanceProfile
-    name: openshift-bootstrap-worker
-    uid: 76c648ab-4528-493a-9701-d7e86cd7b772
 spec:
   profile:
   - data: "[main]\nsummary=Openshift node optimized for deterministic performance

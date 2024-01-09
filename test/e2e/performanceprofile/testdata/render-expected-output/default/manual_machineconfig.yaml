@@ -2,14 +2,11 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   creationTimestamp: null
+  annotations:
+    performanceprofile.openshift.io/generated-at-boostrap-by: manual
   labels:
     machineconfiguration.openshift.io/role: worker-cnf
   name: 50-performance-manual
-  ownerReferences:
-  - apiVersion: performance.openshift.io/v2
-    kind: PerformanceProfile
-    name: manual
-    uid: ""
 spec:
   baseOSExtensionsContainerImage: ""
   config:

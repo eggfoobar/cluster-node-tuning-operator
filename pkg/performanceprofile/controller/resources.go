@@ -68,12 +68,14 @@ func (r *PerformanceProfileReconciler) getMutatedMachineConfig(ctx context.Conte
 	mutated := existing.DeepCopy()
 	mergeMaps(mc.Annotations, mutated.Annotations)
 	mergeMaps(mc.Labels, mutated.Labels)
+	mutated.OwnerReferences = mc.OwnerReferences
 	mutated.Spec = mc.Spec
 
 	// we do not need to update if it no change between mutated and existing object
 	if reflect.DeepEqual(existing.Spec, mutated.Spec) &&
 		apiequality.Semantic.DeepEqual(existing.Labels, mutated.Labels) &&
-		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) {
+		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) &&
+		apiequality.Semantic.DeepEqual(existing.OwnerReferences, mutated.OwnerReferences) {
 		return nil, nil
 	}
 
@@ -146,6 +148,7 @@ func (r *PerformanceProfileReconciler) getMutatedKubeletConfig(kc *mcov1.Kubelet
 	mutated := existing.DeepCopy()
 	mergeMaps(kc.Annotations, mutated.Annotations)
 	mergeMaps(kc.Labels, mutated.Labels)
+	mutated.OwnerReferences = kc.OwnerReferences
 	mutated.Spec = kc.Spec
 
 	existingKubeletConfig := &kubeletconfigv1beta1.KubeletConfiguration{}
@@ -164,7 +167,8 @@ func (r *PerformanceProfileReconciler) getMutatedKubeletConfig(kc *mcov1.Kubelet
 	if apiequality.Semantic.DeepEqual(existingKubeletConfig, mutatedKubeletConfig) &&
 		apiequality.Semantic.DeepEqual(existing.Spec.MachineConfigPoolSelector, mutated.Spec.MachineConfigPoolSelector) &&
 		apiequality.Semantic.DeepEqual(existing.Labels, mutated.Labels) &&
-		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) {
+		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) &&
+		apiequality.Semantic.DeepEqual(existing.OwnerReferences, mutated.OwnerReferences) {
 		return nil, nil
 	}
 
@@ -225,12 +229,14 @@ func (r *PerformanceProfileReconciler) getMutatedTuned(tuned *tunedv1.Tuned) (*t
 	mutated := existing.DeepCopy()
 	mergeMaps(tuned.Annotations, mutated.Annotations)
 	mergeMaps(tuned.Labels, mutated.Labels)
+	mutated.OwnerReferences = tuned.OwnerReferences
 	mutated.Spec = tuned.Spec
 
 	// we do not need to update if it no change between mutated and existing object
 	if apiequality.Semantic.DeepEqual(existing.Spec, mutated.Spec) &&
 		apiequality.Semantic.DeepEqual(existing.Labels, mutated.Labels) &&
-		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) {
+		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) &&
+		apiequality.Semantic.DeepEqual(existing.OwnerReferences, mutated.OwnerReferences) {
 		return nil, nil
 	}
 
@@ -315,6 +321,7 @@ func (r *PerformanceProfileReconciler) getMutatedRuntimeClass(runtimeClass *node
 	mutated := existing.DeepCopy()
 	mergeMaps(runtimeClass.Annotations, mutated.Annotations)
 	mergeMaps(runtimeClass.Labels, mutated.Labels)
+	mutated.OwnerReferences = runtimeClass.OwnerReferences
 	mutated.Handler = runtimeClass.Handler
 	mutated.Scheduling = runtimeClass.Scheduling
 
@@ -322,7 +329,8 @@ func (r *PerformanceProfileReconciler) getMutatedRuntimeClass(runtimeClass *node
 	if apiequality.Semantic.DeepEqual(existing.Handler, mutated.Handler) &&
 		apiequality.Semantic.DeepEqual(existing.Scheduling, mutated.Scheduling) &&
 		apiequality.Semantic.DeepEqual(existing.Labels, mutated.Labels) &&
-		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) {
+		apiequality.Semantic.DeepEqual(existing.Annotations, mutated.Annotations) &&
+		apiequality.Semantic.DeepEqual(existing.OwnerReferences, mutated.OwnerReferences) {
 		return nil, nil
 	}
 

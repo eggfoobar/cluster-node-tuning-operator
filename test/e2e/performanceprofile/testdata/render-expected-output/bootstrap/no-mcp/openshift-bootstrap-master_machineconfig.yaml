@@ -2,14 +2,11 @@ apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   creationTimestamp: null
+  annotations:
+    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-master
   labels:
     machineconfiguration.openshift.io/role: master
   name: 50-performance-openshift-bootstrap-master
-  ownerReferences:
-  - apiVersion: performance.openshift.io/v2
-    kind: PerformanceProfile
-    name: openshift-bootstrap-master
-    uid: eef89480-0259-4bac-83dd-2be7270bbabf
 spec:
   baseOSExtensionsContainerImage: ""
   config:

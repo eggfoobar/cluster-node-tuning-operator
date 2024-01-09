@@ -3,12 +3,9 @@ handler: high-performance
 kind: RuntimeClass
 metadata:
   creationTimestamp: null
+  annotations:
+    performanceprofile.openshift.io/generated-at-boostrap-by: manual
   name: performance-manual
-  ownerReferences:
-  - apiVersion: performance.openshift.io/v2
-    kind: PerformanceProfile
-    name: manual
-    uid: ""
 scheduling:
   nodeSelector:
     node-role.kubernetes.io/worker-cnf: ""
