@@ -1,0 +1,14 @@
+apiVersion: node.k8s.io/v1
+handler: high-performance
+kind: RuntimeClass
+metadata:
+  creationTimestamp: null
+  name: performance-openshift-bootstrap-worker
+  ownerReferences:
+  - apiVersion: performance.openshift.io/v2
+    kind: PerformanceProfile
+    name: openshift-bootstrap-worker
+    uid: 76c648ab-4528-493a-9701-d7e86cd7b772
+scheduling:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""

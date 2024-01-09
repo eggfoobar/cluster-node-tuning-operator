@@ -101,11 +101,12 @@ func ListFilesFromMultiplePaths(dirPaths []string) ([]string, error) {
 	return results, nil
 }
 
-// When no MCPs are present, it is desirable to still generate the relevant files based off of the standard
-// MCP labels and node selectors. Here we create the default `master` and `worker` MCP with their respective base
-// Labels and NodeSelector Labels, this allows any resource such as PAO's to utalize the deault during bootstrap
-// rendoring.
-func CreateLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
+// AppendMissingDefaultMCPManifests When default MCPs are missing, it is desirable to still generate the relevant
+// files based off of the standard MCP labels and node selectors.
+//
+// Here we create the default `master` and `worker` MCP if they are missing with their respective base Labels and NodeSelector Labels,
+// this allows any resource such as PAO's to utalize the deault during bootstrap rendering.
+func AppendMissingDefaultMCPManifests(currentMCPs []*mcfgv1.MachineConfigPool) []*mcfgv1.MachineConfigPool {
 	const (
 		master             = "master"
 		worker             = "worker"
@@ -115,30 +116,54 @@ func CreateLabeledDefaultMCPManifests() []*mcfgv1.MachineConfigPool {
 		masterNodeSelector = components.NodeRoleLabelPrefix + master
 		workerNodeSelector = components.NodeRoleLabelPrefix + worker
 	)
-	return []*mcfgv1.MachineConfigPool{
-		{
-			ObjectMeta: v1.ObjectMeta{
-				Labels: map[string]string{
-					masterLabels: "",
+	var (
+		finalMCPList = []*mcfgv1.MachineConfigPool{}
+		defaultMCPs  = []*mcfgv1.MachineConfigPool{
+			{
+				ObjectMeta: v1.ObjectMeta{
+					Labels: map[string]string{
+						masterLabels: "",
+					},
+					Name: master,
 				},
-				Name: master,
-			},
-			Spec: mcfgv1.MachineConfigPoolSpec{
-				NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, masterNodeSelector, ""),
-			},
-		},
-		{
-			ObjectMeta: v1.ObjectMeta{
-				Labels: map[string]string{
-					workerLabels: "",
+				Spec: mcfgv1.MachineConfigPoolSpec{
+					NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, masterNodeSelector, ""),
 				},
-				Name: worker,
 			},
-			Spec: mcfgv1.MachineConfigPoolSpec{
-				NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, workerNodeSelector, ""),
+			{
+				ObjectMeta: v1.ObjectMeta{
+					Labels: map[string]string{
+						workerLabels: "",
+					},
+					Name: worker,
+				},
+				Spec: mcfgv1.MachineConfigPoolSpec{
+					NodeSelector: v1.AddLabelToSelector(&v1.LabelSelector{}, workerNodeSelector, ""),
+				},
 			},
-		},
+		}
+	)
+
+	if len(currentMCPs) == 0 {
+		return defaultMCPs
 	}
+
+	for _, defaultMCP := range defaultMCPs {
+		missing := true
+		for _, mcp := range currentMCPs {
+			// Since users can supply MCP files and these will be raw files with out going through the API
+			// server validation, we normalize the file name so as to not mask any configuration errors.
+			if strings.ToLower(mcp.Name) == defaultMCP.Name {
+				missing = false
+				break
+			}
+		}
+		if missing {
+			finalMCPList = append(finalMCPList, defaultMCP)
+		}
+	}
+
+	return append(finalMCPList, currentMCPs...)
 }
 
 func AddGeneratedByAnnotation(annotations map[string]string, profileName, profileNamespace string) map[string]string {

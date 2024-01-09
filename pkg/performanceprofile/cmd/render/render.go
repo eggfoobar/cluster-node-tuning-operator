@@ -161,12 +161,8 @@ func render(inputDir, outputDir string) error {
 		}
 	}
 
-	// If we find no MCPs present in the directory, then we assume the default
-	// Master, Worker ones and make sure that any PAO manifests that specify a Master or Worker label
-	// get correctly rendered. Specifying MCPs outside of the default will still cause a failure as is expected.
-	if len(mcPools) == 0 {
-		mcPools = append(mcPools, util.CreateLabeledDefaultMCPManifests()...)
-	}
+	// Append any missing default manifests (i.e. `master`/`worker`)
+	mcPools = util.AppendMissingDefaultMCPManifests(mcPools)
 
 	for _, pp := range perfProfiles {
 		mcp, err := selectMachineConfigPool(mcPools, pp.Spec.NodeSelector)

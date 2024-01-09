@@ -26,6 +26,7 @@ var (
 	defaultPinnedDir   string
 	snoLegacyPinnedDir string
 	bootstrapPPDir     string
+	extraMCPDir        string
 )
 
 var _ = Describe("render command e2e test", func() {
@@ -34,6 +35,7 @@ var _ = Describe("render command e2e test", func() {
 		assetsOutDir = createTempAssetsDir()
 		assetsInDir := filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "base", "performance")
 		bootstrapPPDir = filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "bootstrap-cluster", "performance")
+		extraMCPDir = filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "bootstrap-cluster", "extra-mcp")
 		ppDir = filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "manual-cluster", "performance")
 		defaultPinnedDir = filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "pinned-cluster", "default")
 		snoLegacyPinnedDir = filepath.Join(workspaceDir, "test", "e2e", "performanceprofile", "cluster-setup", "pinned-cluster", "single-node-legacy")
@@ -120,6 +122,25 @@ var _ = Describe("render command e2e test", func() {
 
 			cmd := exec.Command(cmdline[0], cmdline[1:]...)
 			runAndCompare(cmd, path.Join(bootstrapExpectedDir, "no-mcp"))
+
+		})
+	})
+
+	Context("With extra MCP manifest resources during bootstrap", func() {
+		It("should render PerformanceProfile with default", func() {
+
+			bootstrapPPDirs := []string{bootstrapPPDir, defaultPinnedDir, extraMCPDir}
+
+			cmdline := []string{
+				filepath.Join(binPath, "cluster-node-tuning-operator"),
+				"render",
+				"--asset-input-dir", strings.Join(bootstrapPPDirs, ","),
+				"--asset-output-dir", assetsOutDir,
+			}
+			fmt.Fprintf(GinkgoWriter, "running: %v\n", cmdline)
+
+			cmd := exec.Command(cmdline[0], cmdline[1:]...)
+			runAndCompare(cmd, path.Join(bootstrapExpectedDir, "extra-mcp"))
 
 		})
 	})
