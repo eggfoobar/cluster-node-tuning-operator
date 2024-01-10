@@ -5,7 +5,7 @@ metadata:
   labels:
     machineconfiguration.openshift.io/role: master
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-master
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: openshift-bootstrap-master
   name: 50-performance-openshift-bootstrap-master
 spec:
   baseOSExtensionsContainerImage: ""

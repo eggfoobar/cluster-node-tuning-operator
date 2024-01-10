@@ -190,8 +190,10 @@ func render(inputDir, outputDir string) error {
 		}
 
 		for _, componentObj := range components.ToObjects() {
+			// Owner Reference at this stage can cause problems since we won't fully know the owner UUID as
+			// known by the API Server, we set it to nil here to make sure.
 			componentObj.SetOwnerReferences(nil)
-			anno := util.AddBootstrapGeneratedByAnnotation(componentObj.GetAnnotations(), pp.Name, pp.Namespace)
+			anno := util.AddBootstrapRenderedByAnnotation(componentObj.GetAnnotations(), pp.Name, pp.Namespace)
 			componentObj.SetAnnotations(anno)
 		}
 

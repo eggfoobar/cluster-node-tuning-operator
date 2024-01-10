@@ -4,7 +4,7 @@ kind: RuntimeClass
 metadata:
   creationTimestamp: null
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-master
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: openshift-bootstrap-master
   name: performance-openshift-bootstrap-master
 scheduling:
   nodeSelector:

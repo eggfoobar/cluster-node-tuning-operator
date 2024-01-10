@@ -42,6 +42,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -370,6 +371,11 @@ var _ = Describe("Controller", func() {
 			})
 
 			It("should not record new create event", func() {
+				// Performance Profile should already own these manifests at this point
+				controllerutil.SetControllerReference(profile, mc, scheme.Scheme)
+				controllerutil.SetControllerReference(profile, kc, scheme.Scheme)
+				controllerutil.SetControllerReference(profile, tunedPerformance, scheme.Scheme)
+				controllerutil.SetControllerReference(profile, runtimeClass, scheme.Scheme)
 				r := newFakeReconciler(profile, mc, kc, tunedPerformance, runtimeClass, profileMCP, infra, clusterOperator, nodeConfig, profileMC)
 
 				Expect(reconcileTimes(r, request, 1)).To(Equal(reconcile.Result{}))
@@ -383,6 +389,48 @@ var _ = Describe("Controller", func() {
 					Fail("the recorder should not have new events")
 				default:
 				}
+			})
+
+			It("should update resources with performance profile owner reference", func() {
+				r := newFakeReconciler(profile, mc, kc, tunedPerformance, runtimeClass, profileMCP, infra, clusterOperator, nodeConfig, profileMC)
+
+				Expect(reconcileTimes(r, request, 1)).To(Equal(reconcile.Result{}))
+
+				boolTrue := true
+				ownerRef := metav1.OwnerReference{
+					APIVersion:         "performance.openshift.io/v2",
+					Kind:               profile.Kind,
+					Name:               profile.Name,
+					UID:                profile.UID,
+					Controller:         &boolTrue,
+					BlockOwnerDeletion: &boolTrue,
+				}
+
+				// verify MachineConfig update
+				mcResult := &mcov1.MachineConfig{}
+				kcResult := &mcov1.KubeletConfig{}
+				tunedPerformanceResult := &tunedv1.Tuned{}
+				runtimeClassResult := &nodev1.RuntimeClass{}
+
+				err := r.Get(context.TODO(), types.NamespacedName{Name: mc.Name, Namespace: mc.Namespace}, mcResult)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(mcResult.OwnerReferences).ToNot(BeEmpty())
+				Expect(mcResult.OwnerReferences[0]).To(Equal(ownerRef))
+
+				err = r.Get(context.TODO(), types.NamespacedName{Name: kc.Name, Namespace: kc.Namespace}, kcResult)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(kcResult.OwnerReferences).ToNot(BeEmpty())
+				Expect(kcResult.OwnerReferences[0]).To(Equal(ownerRef))
+
+				err = r.Get(context.TODO(), types.NamespacedName{Name: tunedPerformance.Name, Namespace: tunedPerformance.Namespace}, tunedPerformanceResult)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(tunedPerformanceResult.OwnerReferences).ToNot(BeEmpty())
+				Expect(tunedPerformanceResult.OwnerReferences[0]).To(Equal(ownerRef))
+
+				err = r.Get(context.TODO(), types.NamespacedName{Name: runtimeClass.Name, Namespace: runtimeClass.Namespace}, runtimeClassResult)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(runtimeClassResult.OwnerReferences).ToNot(BeEmpty())
+				Expect(runtimeClassResult.OwnerReferences[0]).To(Equal(ownerRef))
 			})
 
 			It("should update MC when RT kernel gets disabled", func() {

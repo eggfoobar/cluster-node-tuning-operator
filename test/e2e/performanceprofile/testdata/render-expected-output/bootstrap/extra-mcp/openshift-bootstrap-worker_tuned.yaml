@@ -3,7 +3,7 @@ kind: Tuned
 metadata:
   creationTimestamp: null
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-worker
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: openshift-bootstrap-worker
   name: openshift-node-performance-openshift-bootstrap-worker
   namespace: openshift-cluster-node-tuning-operator
 spec:

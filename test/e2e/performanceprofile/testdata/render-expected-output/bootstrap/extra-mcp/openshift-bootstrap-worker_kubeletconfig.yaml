@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   name: performance-openshift-bootstrap-worker
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: openshift-bootstrap-worker
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: openshift-bootstrap-worker
 spec:
   kubeletConfig:
     apiVersion: kubelet.config.k8s.io/v1beta1

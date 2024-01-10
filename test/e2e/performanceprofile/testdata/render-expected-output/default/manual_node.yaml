@@ -3,7 +3,7 @@ kind: Node
 metadata:
   creationTimestamp: null
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: manual
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: manual
   name: cluster
 spec:
   cgroupMode: v1

@@ -166,8 +166,8 @@ func AppendMissingDefaultMCPManifests(currentMCPs []*mcfgv1.MachineConfigPool) [
 	return append(finalMCPList, currentMCPs...)
 }
 
-func AddBootstrapGeneratedByAnnotation(annotations map[string]string, profileName, profileNamespace string) map[string]string {
-	const generatedByAnnotationKey = "performanceprofile.openshift.io/generated-at-boostrap-by"
+func AddBootstrapRenderedByAnnotation(annotations map[string]string, profileName, profileNamespace string) map[string]string {
+	const generatedByAnnotationKey = "performanceprofile.openshift.io/rendered-at-bootstrap-by"
 	if annotations == nil {
 		annotations = make(map[string]string)
 	}

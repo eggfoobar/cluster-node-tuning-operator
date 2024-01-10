@@ -3,7 +3,7 @@ kind: MachineConfig
 metadata:
   creationTimestamp: null
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: manual
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: manual
   labels:
     machineconfiguration.openshift.io/role: worker-cnf
   name: 50-performance-manual

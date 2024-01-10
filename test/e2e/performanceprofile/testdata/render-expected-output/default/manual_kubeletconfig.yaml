@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   name: performance-manual
   annotations:
-    performanceprofile.openshift.io/generated-at-boostrap-by: manual
+    performanceprofile.openshift.io/rendered-at-bootstrap-by: manual
 spec:
   kubeletConfig:
     apiVersion: kubelet.config.k8s.io/v1beta1
